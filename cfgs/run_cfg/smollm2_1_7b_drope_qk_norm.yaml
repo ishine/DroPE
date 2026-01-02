@@ -1,0 +1,25 @@
+defaults:
+  - override /trainer_cfg@_global_: base_trainer
+  - override /model_cfg@_global_: smollm2/smollm1p7b
+  - override /data_cfg@_global_: fineweb_edu_shuffled
+  - _self_
+
+custom_class: custom_models.drope.DroPELlamaForCausalLM
+from_pretrained: true
+drope: true
+
+model_custom_config:
+  _target_: custom_models.drope.DroPELlamaConfig.from_pretrained
+  pretrained_model_name_or_path: ${model_name_or_path}
+  attention_type: qk_norm_nope
+
+max_seq_length: 8192
+max_steps: 120000
+learning_rate: 3e-4
+
+wandb_project: drope
+wandb_run_name: ${trainer_log_name}_${model_log_name}_${max_steps}steps_lr${learning_rate}
+
+per_device_train_batch_size: 8
+
+save_steps: 100

@@ -1,0 +1,34 @@
+defaults:
+  - override /trainer_cfg@_global_: base_trainer
+  - override /model_cfg@_global_: llama2/llama7b
+  - override /data_cfg@_global_: fineweb_edu_shuffled
+  - _self_
+
+custom_class: custom_models.drope.DroPELlamaForCausalLM
+from_pretrained: true
+drope: true
+
+model_custom_config:
+  _target_: custom_models.drope.DroPELlamaConfig.from_pretrained
+  pretrained_model_name_or_path: ${model_name_or_path}
+  attention_type: qk_norm_nope
+
+# NOTE: this is 2M tokens (half the original 4M tokens of llama2)
+train_batch_size: 512
+max_seq_length: 4096
+
+# 30B tokens
+max_steps: 15000
+learning_rate: 3e-4
+
+wandb_project: drope-llama2
+wandb_run_name: ${trainer_log_name}_${model_log_name}_${max_steps}steps_bs${train_batch_size}_lr${learning_rate}
+
+per_device_train_batch_size: 32
+
+save_steps: 2500
+
+lr_scheduler_type: cosine
+
+trainer_args:
+  warmup_steps: 100
